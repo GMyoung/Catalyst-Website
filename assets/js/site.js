@@ -16,6 +16,8 @@ document.querySelectorAll('[data-project-form]').forEach((form) => {
       form.reportValidity();
       return;
     }
-    window.location.href = '/thank-you/';
+    const script = document.querySelector('script[src$="assets/js/site.js"]');
+    const siteRoot = script ? new URL('../../', script.src).href : new URL('/', window.location.href).href;
+    window.location.href = new URL('thank-you/', siteRoot).href;
   });
 });

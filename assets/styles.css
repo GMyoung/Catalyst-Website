@@ -334,20 +334,25 @@ h3 {
 }
 
 .nav-links a[aria-current="page"],
-body[data-page="home"] .nav-links a[href="/"],
-body[data-page="services"] .nav-links a[href="/services/"],
-body[data-page="process"] .nav-links a[href="/process/"],
-body[data-page="about"] .nav-links a[href="/about/"],
-body[data-page="contact"] .nav-links a[href="/contact/"] {
+body[data-page="home"] .nav-links a[href="./"], body[data-page="home"] .nav-links a[href="../"],
+body[data-page="services"] .nav-links a[href="services/"], body[data-page="services"] .nav-links a[href="../services/"],
+body[data-page="process"] .nav-links a[href="process/"], body[data-page="process"] .nav-links a[href="../process/"],
+body[data-page="about"] .nav-links a[href="about/"], body[data-page="about"] .nav-links a[href="../about/"],
+body[data-page="contact"] .nav-links a[href="contact/"], body[data-page="contact"] .nav-links a[href="../contact/"] {
   color: var(--orange-500);
 }
 
 .nav-links a[aria-current="page"]::after,
-body[data-page="home"] .nav-links a[href="/"]::after,
-body[data-page="services"] .nav-links a[href="/services/"]::after,
-body[data-page="process"] .nav-links a[href="/process/"]::after,
-body[data-page="about"] .nav-links a[href="/about/"]::after,
-body[data-page="contact"] .nav-links a[href="/contact/"]::after {
+body[data-page="home"] .nav-links a[href="./"]::after,
+body[data-page="home"] .nav-links a[href="../"]::after,
+body[data-page="services"] .nav-links a[href="services/"]::after,
+body[data-page="services"] .nav-links a[href="../services/"]::after,
+body[data-page="process"] .nav-links a[href="process/"]::after,
+body[data-page="process"] .nav-links a[href="../process/"]::after,
+body[data-page="about"] .nav-links a[href="about/"]::after,
+body[data-page="about"] .nav-links a[href="../about/"]::after,
+body[data-page="contact"] .nav-links a[href="contact/"]::after,
+body[data-page="contact"] .nav-links a[href="../contact/"]::after {
   content: "";
   position: absolute;
   left: 0;
