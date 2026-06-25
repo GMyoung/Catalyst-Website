@@ -218,11 +218,21 @@
     position: relative;
     width: 100%;
     height: 100%;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #efe6d8;
     filter: drop-shadow(0 28px 26px rgba(73, 43, 9, 0.24));
     transition: transform 0.3s ease;
   }
   .ring-art:hover { transform: scale(1.12); }
-  .ring-svg { width: 100%; height: 100%; overflow: visible; }
+  .ring-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 48%;
+    transform: scale(1.18) rotate(var(--ring-angle, 0deg));
+    filter: saturate(0.92) contrast(1.04) brightness(1.02);
+  }
   .orbit-label {
     position: absolute;
     left: 112%;
@@ -680,11 +690,12 @@
     .btn-circle { width: 44px; height: 44px; }
     .orbit-label {
       left: 50%;
-      top: 112%;
+      top: 106%;
       transform: translateX(-50%);
       width: min(270px, 76vw);
       text-align: center;
     }
+    .ring-art { filter: drop-shadow(0 18px 18px rgba(73, 43, 9, 0.2)); }
     .orbit-label .ld { margin: 0 auto; }
     .stay-photo { width: 94vw; right: -42vw; opacity: 0.32; }
     .footer-cols { grid-template-columns: 1fr; gap: 36px; margin-bottom: 56px; }
@@ -919,49 +930,6 @@
     var rotationEl = document.getElementById("orbit-rotation");
     var items = [];
 
-    function escapeText(value) {
-      return String(value).replace(/[&<>"']/g, function (ch) {
-        return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch];
-      });
-    }
-
-    function ringSvg(entry, index) {
-      var g = "gold-" + index;
-      var shine = "shine-" + index;
-      var text = escapeText(entry.text);
-      var angle = entry.angle;
-      var thickness = entry.thickness;
-      var outer = 112 + Math.max(0, thickness - 38) * 0.4;
-      var inner = outer - thickness;
-      return [
-        '<svg class="ring-svg" viewBox="0 0 320 320" role="presentation" aria-hidden="true">',
-        '<defs>',
-        '<linearGradient id="' + g + '" x1="56" y1="42" x2="258" y2="276" gradientUnits="userSpaceOnUse">',
-        '<stop offset="0" stop-color="#fff0bb"/>',
-        '<stop offset="0.24" stop-color="#d4a34d"/>',
-        '<stop offset="0.52" stop-color="#ffe7a6"/>',
-        '<stop offset="0.76" stop-color="#a86718"/>',
-        '<stop offset="1" stop-color="#fff2c6"/>',
-        '</linearGradient>',
-        '<radialGradient id="' + shine + '" cx="38%" cy="24%" r="70%">',
-        '<stop offset="0" stop-color="#fff9db" stop-opacity="0.95"/>',
-        '<stop offset="0.42" stop-color="#d4a34d" stop-opacity="0.42"/>',
-        '<stop offset="1" stop-color="#6f440d" stop-opacity="0.18"/>',
-        '</radialGradient>',
-        '</defs>',
-        '<g transform="translate(160 160) rotate(' + angle + ') translate(-160 -160)">',
-        '<ellipse cx="160" cy="160" rx="' + outer + '" ry="72" fill="none" stroke="url(#' + g + ')" stroke-width="' + thickness + '" stroke-linecap="round"/>',
-        '<ellipse cx="160" cy="160" rx="' + inner + '" ry="42" fill="none" stroke="rgba(83,47,8,0.34)" stroke-width="2"/>',
-        '<path d="M72 148 C114 88 206 88 248 148" fill="none" stroke="rgba(255,255,255,0.62)" stroke-width="8" stroke-linecap="round"/>',
-        '<path d="M70 178 C112 238 208 238 250 178" fill="none" stroke="rgba(102,58,9,0.22)" stroke-width="7" stroke-linecap="round"/>',
-        '<text x="160" y="156" text-anchor="middle" dominant-baseline="middle" font-family="Instrument Serif, Georgia, serif" font-size="34" letter-spacing="5" fill="#7b4b10" opacity="0.72">' + text + '</text>',
-        '<path d="M98 162 C118 146 132 146 152 162 C132 178 118 178 98 162 Z" fill="none" stroke="#8c5c17" stroke-width="4" opacity="0.65"/>',
-        '<circle cx="152" cy="162" r="5" fill="url(#' + shine + ')" opacity="0.9"/>',
-        '</g>',
-        '</svg>'
-      ].join("");
-    }
-
     ORBIT.forEach(function (entry, i) {
       var wrap = document.createElement("div");
       wrap.className = "orbit-item";
@@ -974,7 +942,14 @@
       art.className = "ring-art";
       art.setAttribute("role", "img");
       art.setAttribute("aria-label", entry.title);
-      art.innerHTML = ringSvg(entry, i);
+      art.style.setProperty("--ring-angle", entry.angle + "deg");
+      var photo = document.createElement("img");
+      photo.className = "ring-photo";
+      photo.src = "mqpz7yk1-1764195694273.jpg";
+      photo.alt = "";
+      photo.loading = "lazy";
+      photo.decoding = "async";
+      art.appendChild(photo);
       counter.appendChild(art);
 
       var label = document.createElement("div");
@@ -1066,15 +1041,18 @@
     }
 
     function applyOrbit(p, advance) {
+      var mobile = window.innerWidth <= 620;
+      var targetRadius = mobile ? 430 : TARGET_RADIUS;
+      var edgeRadius = mobile ? 220 : 330;
+      var entryRy = mobile ? 110 : 140;
+      var itemMax = mobile ? 300 : 360;
+      var txPad = mobile ? 0 : 200;
       var stops = [0.15, 0.25, 0.85, 0.95, 1];
-      var itemSize = track(p, stops, [80, 360, 360, 80, 80]);
-      var rx = track(p, stops, [330, TARGET_RADIUS, TARGET_RADIUS, 330, 330]);
-      var ry = track(p, stops, [140, TARGET_RADIUS, TARGET_RADIUS, 140, 140]);
+      var itemSize = track(p, stops, [80, itemMax, itemMax, 80, 80]);
+      var rx = track(p, stops, [edgeRadius, targetRadius, targetRadius, edgeRadius, edgeRadius]);
+      var ry = track(p, stops, [entryRy, targetRadius, targetRadius, entryRy, entryRy]);
       var rot = track(p, stops, [-15, 0, 0, -15, -15]);
-      var tx = track(p, stops, [0, -(TARGET_RADIUS + 200), -(TARGET_RADIUS + 200), 0, 0]);
       var focus = track(p, stops, [0, 1, 1, 0, 0]);
-
-      rotationEl.style.transform = "rotate(" + rot + "deg) translateX(" + tx + "px)";
 
       var scrollDelta = p - prevScroll;
       prevScroll = p;
@@ -1085,6 +1063,10 @@
       var scale = frameW / BASE;
       var cx = BASE / 2;
       var cy = BASE / 2;
+      var txTarget = mobile ? -(targetRadius * scale * 0.35) : -(targetRadius + txPad);
+      var tx = track(p, stops, [0, txTarget, txTarget, 0, 0]);
+
+      rotationEl.style.transform = "rotate(" + rot + "deg) translateX(" + tx + "px)";
 
       for (var i = 0; i < items.length; i++) {
         var it = items[i];
